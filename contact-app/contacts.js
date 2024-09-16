@@ -1,10 +1,6 @@
 const fs = require("fs");
-const readline = require("readline");
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+const chalk = require("chalk");
+const validator = require("validator");
 
 // membuat folder data jika belum ada
 const dirPath = "./data";
@@ -18,27 +14,38 @@ if (!fs.existsSync(dataPath)) {
   fs.writeFileSync(dataPath, "[]", "utf-8");
 }
 
-// membuat func untuk pertanyaan
-const tulisPertanyaan = (pertanyaan) => {
-  return new Promise((resolve, reject) => {
-    rl.question(pertanyaan, (pertanyaan) => {
-      resolve(pertanyaan);
-    });
-  });
-};
-
 const simpanContact = (nama, email, noHP) => {
   const newContact = { nama, email, noHP };
   const data = fs.readFileSync("data/contacts.json", "utf-8");
-
   const contacts = JSON.parse(data);
+
+  // Cek duplikat nama
+  const duplicate = contacts.find((contact) => contact.nama === nama);
+  if (duplicate) {
+    console.log(
+      chalk.red.inverse.bold("Contact sudah terdaftar, gunakan nama lain!")
+    );
+    return false;
+  }
+
+  // Cek email
+  if (email) {
+    if (!validator.isEmail(email)) {
+      console.log(chalk.red.inverse.bold("Email tidak valid!"));
+      return;
+    }
+  }
+
+  // Cek no HP
+  if (!validator.isMobilePhone(noHP, "id-ID")) {
+    console.log(chalk.red.inverse.bold("No Handphone tidak valid!"));
+    return;
+  }
 
   contacts.push(newContact);
   fs.writeFileSync("data/contacts.json", JSON.stringify(contacts, null, 2));
 
-  console.log(`Terimakasih ${nama} sudah menginputkan data`);
-
-  rl.close();
+  console.log(chalk.green.inverse.bold(`Terimakasih sudah menginputkan data`));
 };
 
-module.exports = { tulisPertanyaan, simpanContact };
+module.exports = { simpanContact };
