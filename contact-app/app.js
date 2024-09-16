@@ -1,5 +1,5 @@
 const yargs = require("yargs");
-const { simpanContact } = require("./contacts");
+const { simpanContact, listContact } = require("./contacts");
 
 yargs
   .command({
@@ -27,5 +27,14 @@ yargs
     },
   })
   .demandCommand();
+
+// Menampilkan daftar semua nama & no hp contact
+yargs.command({
+  command: "list",
+  describe: "Semua nama & no HP contact",
+  handler() {
+    listContact();
+  },
+});
 
 yargs.parse();

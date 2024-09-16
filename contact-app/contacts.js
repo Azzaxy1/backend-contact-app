@@ -14,10 +14,16 @@ if (!fs.existsSync(dataPath)) {
   fs.writeFileSync(dataPath, "[]", "utf-8");
 }
 
-const simpanContact = (nama, email, noHP) => {
-  const newContact = { nama, email, noHP };
+const loadContact = () => {
   const data = fs.readFileSync("data/contacts.json", "utf-8");
   const contacts = JSON.parse(data);
+  return contacts;
+};
+
+const simpanContact = (nama, email, noHP) => {
+  const newContact = { nama, email, noHP };
+
+  const contacts = loadContact();
 
   // Cek duplikat nama
   const duplicate = contacts.find((contact) => contact.nama === nama);
@@ -48,4 +54,14 @@ const simpanContact = (nama, email, noHP) => {
   console.log(chalk.green.inverse.bold(`Terimakasih sudah menginputkan data`));
 };
 
-module.exports = { simpanContact };
+const listContact = () => {
+  const contacts = loadContact();
+
+  console.log(chalk.cyan.inverse.bold("Daftar Kontak : "));
+
+  contacts.forEach((contact, index) => {
+    console.log(`${index + 1}. ${contact.nama} - ${contact.noHP}`);
+  });
+};
+
+module.exports = { simpanContact, listContact };
